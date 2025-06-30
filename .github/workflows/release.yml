@@ -101,4 +101,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             DRONE_TAG=${{ github.ref_name }}
-
+  push-release-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: oras-project/setup-oras@v1
+      with:
+        version: 1.0.0
