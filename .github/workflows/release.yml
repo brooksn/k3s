@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: 
       packages: write # Needed to push images to GHCR
+      id-token: write # Needed for cosign
     needs: [build-amd64, build-arm64, build-arm]
     steps:
       - name: Checkout code
