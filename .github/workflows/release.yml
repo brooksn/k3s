@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: 
       packages: write # Needed to push images to GHCR
-      id-token: write # Needed for cosign
+      id-token: write # Needed for cosign OIDC
     needs: [build-amd64, build-arm64, build-arm]
     steps:
       - name: Checkout code
@@ -107,7 +107,26 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.5.0
 
-      - name: Sign image
-        env:
-          IMG: ${{ steps.meta.outputs.tags }}
-        run: cosign sign --oidc-provider=github-actions --yes "${IMG}"
+      - name: Install ORAS
+        uses: oras-project/setup-oras@v1
+
+      - name: Download release assets
+        run: |
+          mkdir release_assets
+          gh release download "${{ github.ref_name }}" --dir ./release_assets
+
+      - name: Bundle and upload assets to GHCR
+        run: |
+          TAG="${{ github.ref_name }}"
+          TAG=${TAG//+/-}
+          IMG="ghcr.io/${{ github.repository_owner }}/k3s:${TAG}-assets"
+          oras push "${IMG}" ./release_assets/
+
+      - name: Sign images
+        run: |
+          TAG="${{ github.ref_name }}"
+          TAG=${TAG//+/-}
+          IMG="ghcr.io/${{ github.repository_owner }}/k3s:${TAG}-assets"
+
+          cosign sign --oidc-provider=github-actions --yes "${IMG}"
+          cosign sign --oidc-provider=github-actions --yes "${IMG}"
