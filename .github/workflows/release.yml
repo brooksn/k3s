@@ -119,14 +119,14 @@ jobs:
         run: |
           TAG="${{ github.ref_name }}"
           TAG=${TAG//+/-}
-          IMG="ghcr.io/${{ github.repository_owner }}/k3s:${TAG}-assets"
+          IMG="ghcr.io/${{ github.repository_owner }}/k3s-assets:${TAG}"
           oras push "${IMG}" ./release_assets/
 
       - name: Sign images
         run: |
           TAG="${{ github.ref_name }}"
           TAG=${TAG//+/-}
-          IMG="ghcr.io/${{ github.repository_owner }}/k3s:${TAG}-assets"
+          IMG="ghcr.io/${{ github.repository_owner }}/k3s-assets:${TAG}"
 
           cosign sign --oidc-provider=github-actions --yes "${IMG}"
           cosign sign --oidc-provider=github-actions --yes "${IMG}"
