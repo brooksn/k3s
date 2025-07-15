@@ -111,6 +111,8 @@ jobs:
         uses: oras-project/setup-oras@v1
 
       - name: Download release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir release_assets
           gh release download "${{ github.ref_name }}" --dir ./release_assets
