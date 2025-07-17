@@ -129,6 +129,9 @@ jobs:
     needs:
       - push-release-image
     steps:
+      - name: Checkout K3s
+        uses: actions/checkout@v4
+
       - name: Install ORAS
         uses: oras-project/setup-oras@v1
 
