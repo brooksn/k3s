@@ -170,7 +170,7 @@ jobs:
           TAG="${{ github.ref_name }}"
           TAG=${TAG//+/-}
           IMG="ghcr.io/${{ github.repository_owner }}/k3s-assets:${TAG}"
-          oras push "${IMG}" ./release_assets/
+          oras push "${IMG}" ./dist/artifacts
 
       - name: Sign images
         run: |
