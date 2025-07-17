@@ -107,6 +107,9 @@ jobs:
   sign-release-image:
     name: Sign Release Image
     runs-on: ubuntu-latest
+    permissions:
+      packages: write # Needed to push images to GHCR
+      id-token: write # Needed for cosign OIDC
     needs:
       - push-release-image
     steps:
