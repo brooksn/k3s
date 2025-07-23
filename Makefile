@@ -78,3 +78,7 @@ local-airgap:
 
 .PHONY: local-ci
 local-ci:  local-binary local-image local-airgap
+
+.PHONY: repackage-assets
+repackage-assets:
+	./scripts/repackage

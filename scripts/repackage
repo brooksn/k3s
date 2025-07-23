@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e -x
+
+cd $(dirname $0)/..
+
+. ./scripts/version.sh
+
+REPO=${REPO:-rancher}
+IMAGE_NAME=${IMAGE_NAME:-k3s-assets}
+IMAGE=${REPO}/${IMAGE_NAME}:${VERSION_TAG}
+IID_FILE=${IID_FILE:-./iid}
+
+gh release download "${VERSION}" --dir ./dist/artifacts
+
+oras push "${IMAGE}" ./dist/artifacts
+
+oras resolve "${IMAGE}" > ${IID_FILE}
