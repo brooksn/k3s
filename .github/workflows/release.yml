@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  packages: read
+  packages: write
 
 jobs:
   build-amd64:
@@ -134,21 +134,17 @@ jobs:
           path: dist/artifacts/k3s-airgap-images-${{ matrix.arch }}.sha256sum
       
       - name: Upload k3s-images.txt to Release
-        uses: softprops/action-gh-release@v2
-        # This action is recommended by GITHUB, they don't support a first party action for releases
-        # See https://github.com/actions/create-release?tab=readme-ov-file#github-action---releases-api
         if: ${{ matrix.arch == 'amd64' }}
-        with:
-          files: |
+        run: |
+          gh release upload ${{ github.ref_name }} \
             dist/artifacts/k3s-images.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Airgap Assets to Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/artifacts/k3s-airgap-images*
+        run: |
+          gh release upload ${{ github.ref_name }} \
+            dist/artifacts/k3s-airgap-images-${{ matrix.arch }}*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -156,6 +152,8 @@ jobs:
     name: Prepare and Upload Release Assets
     permissions: 
       contents: write # Needed to update release with assets
+      packages: write
+      id-token: write
     runs-on: ubuntu-latest
     needs: [build-amd64, build-arm64, build-arm, upload-release-airgap]
     steps:
@@ -185,11 +183,38 @@ jobs:
         done    
     
     - name: Upload Assets to Release
-      uses: softprops/action-gh-release@v2.2.1
-      with:
-        files: |
-          dist/artifacts/k3s*
+      run: |
+        gh release upload ${{ github.ref_name }} \
+          dist/artifacts/k3s* \
           dist/artifacts/sha256sum*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  package-release-assets:
+    name: Package Release Assets
+    permissions: 
+      contents: write # Needed to update release with assets
+      packages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    needs: [upload-release-assets, upload-release-airgap, push-release-image]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install ORAS
+      uses: oras-project/setup-oras@v1
+
+    - name: Repackage assets
+      env:
+        GH_TOKEN: ${{ github.token }}
+        REPO: ghcr.io/${{ github.repository_owner }}
+      run: |
+        make repackage-assets
