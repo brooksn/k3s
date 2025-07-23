@@ -134,21 +134,17 @@ jobs:
           path: dist/artifacts/k3s-airgap-images-${{ matrix.arch }}.sha256sum
       
       - name: Upload k3s-images.txt to Release
-        uses: softprops/action-gh-release@v2
-        # This action is recommended by GITHUB, they don't support a first party action for releases
-        # See https://github.com/actions/create-release?tab=readme-ov-file#github-action---releases-api
         if: ${{ matrix.arch == 'amd64' }}
-        with:
-          files: |
+        run: |
+          gh release upload ${{ github.ref_name }} \
             dist/artifacts/k3s-images.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Airgap Assets to Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/artifacts/k3s-airgap-images*
+        run: |
+          gh release upload ${{ github.ref_name }} \
+            dist/artifacts/k3s-airgap-images-${{ matrix.arch }}*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -185,10 +181,9 @@ jobs:
         done    
     
     - name: Upload Assets to Release
-      uses: softprops/action-gh-release@v2.2.1
-      with:
-        files: |
-          dist/artifacts/k3s*
+      run: |
+        gh release upload ${{ github.ref_name }} \
+          dist/artifacts/k3s* \
           dist/artifacts/sha256sum*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
