@@ -215,6 +215,6 @@ jobs:
     - name: Repackage assets
       env:
         GH_TOKEN: ${{ github.token }}
-        REPO: ${{ github.repository_owner }}
+        REPO: ghcr.io/${{ github.repository_owner }}
       run: |
         make repackage-assets
