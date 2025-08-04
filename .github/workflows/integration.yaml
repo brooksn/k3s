@@ -63,12 +63,6 @@ jobs:
         chmod +x ./dist/artifacts/k3s
         mkdir -p $GOCOVERDIR
         sudo -E env "PATH=$PATH" go test -timeout=45m ./tests/integration/${{ matrix.itest }}/... -run Integration -ginkgo.v -test.v
-    - name: On Failure, Launch Debug Session
-      uses: lhotari/action-upterm@v1
-      if: ${{ failure() }}
-      with:
-        ## If no one connects after 5 minutes, shut down server.
-        wait-timeout-minutes: 5
     - name: Generate coverage report
       run: go tool covdata textfmt -i $GOCOVERDIR -o ${{ matrix.itest }}.out
     - name: Upload Results To Codecov
