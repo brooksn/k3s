@@ -202,21 +202,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Install ORAS
       uses: oras-project/setup-oras@v1
 
     - name: Repackage assets
-      uses: rancher/ecm-distro-tools/actions/publish-image@master
       env:
         GH_TOKEN: ${{ github.token }}
-      with:
-        image: "k3s-assets"
-        tag: ${{ github.ref_name }}
-        make-target: repackage-assets
-        push-to-public: false
-        push-to-prime: true
-
-        prime-repo: ${{ github.repository_owner }}
-        prime-registry: ghcr.io
-        prime-username: ${{ github.repository_owner }}
-        prime-password: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        make repackage-assets
