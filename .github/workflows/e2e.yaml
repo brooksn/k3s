@@ -102,19 +102,6 @@ jobs:
           name: e2e-${{ matrix.etest}}-logs
           path: tests/e2e/${{ matrix.etest }}/*log.txt
           retention-days: 30
-      - name: On Failure, Launch Debug Session
-        uses: lhotari/action-upterm@v1
-        if: ${{ failure() }}
-        with:
-          ## If no one connects after 5 minutes, shut down server.
-          wait-timeout-minutes: 5
-      - name: Upload Results To Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: tests/e2e/${{ matrix.etest }}/coverage.out
-          flags: e2etests # optional
-          verbose: true # optional (default = false)
   
   build-go-tests:
     name: "Build Go Tests"
