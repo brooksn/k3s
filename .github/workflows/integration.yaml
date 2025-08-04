@@ -1,6 +1,8 @@
 name: Integration Test Coverage
 on: 
   push:
+    tags-ignore:
+      - v*
     paths-ignore:
       - "**.md"
       - "channel.yaml"

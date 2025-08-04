@@ -1,6 +1,8 @@
 name: E2E Test Coverage
 on: 
   push:
+    tags-ignore:
+      - v*
     paths-ignore:
       - "**.md"
       - "channel.yaml"
