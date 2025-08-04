@@ -152,6 +152,8 @@ jobs:
     name: Prepare and Upload Release Assets
     permissions: 
       contents: write # Needed to update release with assets
+      packages: write
+      id-token: write
     runs-on: ubuntu-latest
     needs: [build-amd64, build-arm64, build-arm, upload-release-airgap]
     steps:
@@ -187,4 +189,32 @@ jobs:
           dist/artifacts/sha256sum*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  package-release-assets:
+    name: Package Release Assets
+    permissions: 
+      contents: write # Needed to update release with assets
+      packages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    needs: [upload-release-assets, upload-release-airgap, push-release-image]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    - name: Install ORAS
+      uses: oras-project/setup-oras@v1
+
+    - name: Repackage assets
+      uses: rancher/ecm-distro-tools/actions/publish-image@master
+      with:
+        image: "k3s-assets"
+        tag: ${{ github.ref_name }}
+        make-target: repackage-assets
+        push-to-public: false
+        push-to-prime: true
+
+        prime-repo: rancher
+        prime-registry: ghcr.io
+        prime-username: ${{ github.repository_owner }}
+        prime-password: ${{ secrets.GITHUB_TOKEN }}
