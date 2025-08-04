@@ -216,7 +216,7 @@ jobs:
         push-to-public: false
         push-to-prime: true
 
-        prime-repo: rancher
+        prime-repo: ${{ github.repository_owner }}
         prime-registry: ghcr.io
         prime-username: ${{ github.repository_owner }}
         prime-password: ${{ secrets.GITHUB_TOKEN }}
