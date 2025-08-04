@@ -10,6 +10,6 @@ REPO=${REPO:-rancher}
 IMAGE_NAME=${IMAGE_NAME:-k3s-assets}
 IMAGE=${REPO}/${IMAGE_NAME}:${TAG}
 
-gh release download "${VERSION}" --output ./dist/artifacts
+gh release download "${VERSION}" --dir ./dist/artifacts
 
 oras push "${IMAGE}" ./dist/artifacts
